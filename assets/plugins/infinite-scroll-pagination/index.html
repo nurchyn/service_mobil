@@ -1,0 +1,159 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>jQuery Infinite Scroll Pagination Example</title>
+<link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet">
+<link href="css/scrollpagination.css" rel="stylesheet" media="screen" />
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/scrollpagination.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $('#content').scrollPagination({
+            'url': 'democontent.json',
+            'data': {
+                'page': 1,
+                'size': 15
+            }
+        });
+    });
+</script>
+<style>
+    body {
+    margin: 20px 0px 20px 0px;
+    padding: 0px;
+    background: #493333;
+    color: #e4e4e4;
+    font-family:"Nunito",sans-serif;
+}
+
+.about {
+    background: #a47792;
+    color: #303030;
+    font-size: 14px;
+    width: 600px;
+    margin: 10px auto;
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+.about  h1 {
+    font-size: 29px;
+    margin: 5px;
+    padding: 0px;
+    color: #352828;
+}
+
+.about  a {
+    color: #352828;
+}
+
+.about textarea {
+    width: 500px;
+    border: 0px;
+    border-left: 40px solid #493333;
+    background: #c6c6aa;
+    padding: 10px 10px 10px 20px;
+    margin: 0px auto;
+    display: block;
+    color: #000 !important;
+    font-size: 14px;
+    height: 600px;
+    overflow: hidden;
+}
+#scrollpagination {
+    margin: 150px auto;
+}
+</style>
+</head>
+<body><div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="https://www.jqueryscript.net/loading/infinite-scroll-pagination.html">Download This Plugin</a></li>
+<li><a href="https://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul><div id="carbon-block"></div>
+<div class="jquery-script-ads"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2783044520727903";
+/* jQuery_demo */
+google_ad_slot = "2780937993";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+<div id="scrollpagination">
+    <div class="about">
+        <h1>jQuery Infinite Scroll Pagination Example</h1>
+    </div>
+    <div class="about">
+        <h1>Example</h1>
+<pre><code class="javascript">$(function(){
+    $('#content').scrollPagination({
+        'url': 'democontent.json', // The url you are fetching the results.
+        'data': {
+            // These are the variables you can pass to the request
+            'page': 1, // Which page at the firsttime
+            'size': 15, // Number of pages
+        },
+        'scroller': $(window), // Who gonna scroll? default is the full window
+        'autoload':false, // Change this to false if you want to load manually, default true.
+        'heightOffset': 0, // It gonna request when scroll is 10 pixels before the page ends
+        'loading': "#loading", // ID of loading prompt.
+        'loadingText': 'click to loading more.', // Text of loading prompt.
+        'loadingNomoreText': 'No more.', // No more of loading prompt.
+        'manuallyText': 'click to loading more.', // Click of loading prompt.
+        'before': function(){
+            // Before load function, you can display a preloader div
+            // example:
+            $(this.loading).fadeIn();
+        },
+        'after': function(elementsLoaded){
+            // After loading content, you can use this function to animate your new elements
+            // example:
+            $(this.loading).fadeOut();
+            $(elementsLoaded).fadeInWithDelay();
+        }
+    });
+});</code></pre>
+    </div>
+    <ul id="content"></ul>
+    <div class="loading" id="loading"></div>
+</div>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script>
+try {
+  fetch(new Request("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", { method: 'HEAD', mode: 'no-cors' })).then(function(response) {
+    return true;
+  }).catch(function(e) {
+    var carbonScript = document.createElement("script");
+    carbonScript.src = "//cdn.carbonads.com/carbon.js?serve=CK7DKKQU&placement=wwwjqueryscriptnet";
+    carbonScript.id = "_carbonads_js";
+    document.getElementById("carbon-block").appendChild(carbonScript);
+  });
+} catch (error) {
+  console.log(error);
+}
+</script>
+</body>
+</html>

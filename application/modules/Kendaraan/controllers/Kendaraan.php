@@ -15,6 +15,7 @@ class Kendaraan extends CI_Controller {
 		$this->load->model('m_global');
 		$this->load->model('set_role/m_set_role', 'm_role');
 		$this->load->library('barcode_lib');
+		$this->load->library('perhitungan_lib');
 	}
 
 	public function index()
@@ -912,5 +913,17 @@ class Kendaraan extends CI_Controller {
 		);
 		
 		echo json_encode($data);
+	}
+
+	public function get_perhitungan()
+	{
+		### nyeluk library yo mas 
+		### ben ga rame controller e
+		$data = $this->perhitungan_lib->main();
+		
+		echo "<pre>";
+		print_r ($data);
+		echo "</pre>";
+		
 	}
 }

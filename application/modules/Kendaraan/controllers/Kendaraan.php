@@ -915,15 +915,36 @@ class Kendaraan extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function get_perhitungan()
+	public function get_perhitungan($epoch = 2)
 	{
+
 		### nyeluk library yo mas 
 		### ben ga rame controller e
-		$data = $this->perhitungan_lib->main();
+		$result = [];
+
+		for ($i=0; $i <$epoch; $i++) { 
+			if($i == 0) {
+				//first loop
+				$data = $this->perhitungan_lib->main(null, null, $i+1);
+			}else{
+				// get previous data
+				// echo "<pre>";
+				// print_r ($result);
+				// echo "</pre>";
+				// exit;
+				$data = $this->perhitungan_lib->main(null, null, $i+1, $result[$i-1]);
+			}
+
+			array_push($result, $data);
+		}
 		
+		
+		$result = $data; 
 		echo "<pre>";
 		print_r ($data);
 		echo "</pre>";
+
+		// exit;
 		
 	}
 }

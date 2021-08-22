@@ -1,6 +1,12 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-class Perhitungan_lib
+class Perhitungan_lib extends CI_Controller
 {
+
+    function __construct(){
+		$this->_ci = &get_instance();
+		$this->_ci->load->model('m_global');  //<-------Load the Model first
+    }
+
 	public function get_data_inputan()
 	{
 		$arr = [

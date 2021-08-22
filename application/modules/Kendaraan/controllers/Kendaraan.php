@@ -915,14 +915,65 @@ class Kendaraan extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function get_perhitungan($epoch = 100)
+	public function get_perhitungan($epoch = 10)
 	{
 
 		### nyeluk library yo mas 
 		### ben ga rame controller e
 		$result = [];
 
+		$obj_date = new DateTime();
+		$timestamp = $obj_date->format('Y-m-d H:i:s');
+		$id_kendaraan_1 = 1;
+		$id_kendaraan_2 = 2;
+		
+		$input = [
+            'x1' => [0.5, 0, 0.75, 0.25, 1],
+            'x2' => [0.25, 0, 1, 0.5, 1],   
+            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1],
+            'a' => 0.1
+        ];
+
+		$bobot = [
+            'v11' => [0.03,0.03,0.03,0.03,0.03],
+            'v12' => [0.02,0.02,0.02,0.02,0.02],   
+            'v21' => [0.2,0.2,0.2,0.2,0.2,0.2],
+            'v22' => [0.3,0.3,0.3,0.3,0.3,0.3],
+            'bias1' => [0.7,0.7,0.7,0.7,0.7],
+            'bias2' => [0.3,0.3,0.3,0.3,0.3],
+            'w1' => [0.5,0.5,0.5,0.5,0.5],
+            'w2' => [0.09,0.09,0.09,0.09,0.09],
+            'b' => [0.31,0.31,0.31,0.31,0.31],
+        ];
+
+		$this->db->trans_begin();
+
+		$ins_header = [
+			'id_kendaraan_1' => $id_kendaraan_1,
+			'id_kendaraan_2' => $id_kendaraan_2,
+			'arr_input_x1' => json_encode($input['x1']),
+			'arr_input_x2' => json_encode($input['x2']),
+			'arr_input_t' => json_encode($input['t']),
+			'alpha' => $input['a'],
+			'arr_bobot_v11_awal' => json_encode($bobot['v11']),
+			'arr_bobot_v12_awal' => json_encode($bobot['v12']),
+			'arr_bobot_v21_awal' => json_encode($bobot['v21']),
+			'arr_bobot_v22_awal' => json_encode($bobot['v22']),
+
+			'arr_bias_1_awal' => json_encode($bobot['bias1']),
+			'arr_bias_2_awal' => json_encode($bobot['bias2']),
+			'arr_bobot_w1_awal' => json_encode($bobot['w1']),
+			'arr_bobot_w2_awal' => json_encode($bobot['w2']),
+			'arr_bobot_b_awal' => json_encode($bobot['b']),
+			'epoch' => $epoch,
+			'jml_baris_input' => count($input['x1']),
+			'created_at' => $timestamp
+		];
+
+		$id_header = $this->m_global->store_id($ins_header, 't_perhitungan');
+
 		for ($i=0; $i <$epoch; $i++) { 
+			
 			if($i == 0) {
 				//first loop
 				/**
@@ -939,13 +990,62 @@ class Kendaraan extends CI_Controller {
 				$data = $this->perhitungan_lib->main(null, null, $result[$i-1]);
 			}
 
+			$ins_det = [
+				'id_perhitungan' => $id_header,
+				'epoch_ke' => $i+1,
+				'arr_bobot_v11' => json_encode($data['arr_bobot']['v11']),
+				'arr_bobot_v12' => json_encode($data['arr_bobot']['v12']),
+				'arr_bobot_v21' => json_encode($data['arr_bobot']['v21']),
+				'arr_bobot_v22' => json_encode($data['arr_bobot']['v22']),
+				'arr_bobot_bias1' => json_encode($data['arr_bobot']['bias1']),
+				'arr_bobot_bias2' => json_encode($data['arr_bobot']['bias2']),
+				'arr_bobot_w1' => json_encode($data['arr_bobot']['w1']),
+				'arr_bobot_w2' => json_encode($data['arr_bobot']['w2']),
+				'arr_bobot_b' => json_encode($data['arr_bobot']['b']),
+				'arr_aktivasi_z1_raw' => json_encode($data['aktivasi']['z1_raw']),
+				'arr_aktivasi_z2_raw' => json_encode($data['aktivasi']['z2_raw']),
+				'arr_aktivasi_z1' => json_encode($data['aktivasi']['z1']),
+				'arr_aktivasi_z2' => json_encode($data['aktivasi']['z2']),
+				'arr_output_y' => json_encode($data['output']['y']),
+				'arr_output_aktivasi' => json_encode($data['output']['aktivasi']),
+				'arr_output_faktor_error_y' => json_encode($data['output']['faktor_error_y']),
+				'arr_output_perubahan_bobot_w1' => json_encode($data['output']['perubahan_bobot_w1']),
+				'arr_output_perubahan_bobot_w2' => json_encode($data['output']['perubahan_bobot_w2']),
+				'arr_output_perubahan_bobot_w_bias' => json_encode($data['output']['perubahan_bobot_w_bias']),
+				'arr_output_faktor_error_z_net1' => json_encode($data['output']['faktor_error_z_net1']),
+				'arr_output_faktor_error_z_net2' => json_encode($data['output']['faktor_error_z_net2']),
+				'arr_output_faktor_error_z1' => json_encode($data['output']['faktor_error_z1']),
+				'arr_output_faktor_error_z2' => json_encode($data['output']['faktor_error_z2']),
+				'arr_output_perubahan_bobot_v11' => json_encode($data['output']['perubahan_bobot_v11']),
+				'arr_output_perubahan_bobot_v12' => json_encode($data['output']['perubahan_bobot_v12']),
+				'arr_output_perubahan_bobot_v21' => json_encode($data['output']['perubahan_bobot_v21']),
+				'arr_output_perubahan_bobot_v22' => json_encode($data['output']['perubahan_bobot_v22']),
+				'arr_output_perubahan_bobot_vb1' => json_encode($data['output']['perubahan_bobot_vb1']),
+				'arr_output_perubahan_bobot_vb2' => json_encode($data['output']['perubahan_bobot_vb2']),
+				'arr_output_error' => json_encode($data['output']['error']),
+				'arr_output_error2' => json_encode($data['output']['error2']),
+				'mse' => $data['mse'],
+			];
+
+			$this->m_global->store($ins_det, 't_perhitungan_det');
+			$arr_mse[] = $data['mse'];
+
+			if ($this->db->trans_status() === FALSE){
+				$this->db->trans_rollback();
+				echo 'gagal';
+				return;
+			}else{
+				$this->db->trans_commit();
+			}
+
 			array_push($result, $data);
 		}
+		
+		$mse_min = min($arr_mse);
+		// update_t_perhitungan
+		$this->m_global->update('t_perhitungan', ['mse_terkecil' => $mse_min], ['id' => $id_header]);
 
-
-		echo "<pre>";
-		print_r ($result);
-		echo "</pre>";
+		echo 'sukses';
 
 		// exit;
 		

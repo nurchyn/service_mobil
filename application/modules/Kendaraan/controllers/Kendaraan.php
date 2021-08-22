@@ -198,7 +198,9 @@ class Kendaraan extends CI_Controller {
 								<button class="dropdown-item" onclick="list_pekerjaan(\''.$kendaraan->id.'\')">
 									<i class="la la-list"></i> List Pekerjaan
 								</button>
-							
+								<button class="dropdown-item" onclick="hitung_prediksi(\''.$kendaraan->id.'\')">
+									<i class="la la-bar-chart-o"></i> Hitung Prediksi
+								</button>
 								<button class="dropdown-item" onclick="delete_kendaraan(\''.$kendaraan->id.'\')">
 									<i class="la la-trash"></i> Hapus
 								</button>			
@@ -915,7 +917,94 @@ class Kendaraan extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function get_perhitungan($epoch = 10)
+	public function hitung_prediksi()
+	{
+		#### inputan
+		$x1 = [];
+		$x2 = [];
+		$t = [];
+		#### bobot
+		$v11 = [];
+		$v12 = [];   
+		$v21 = [];
+		$v22 = [];
+		$bias1 = [];
+		$bias2 = [];
+		$w1 = [];
+		$w2 = [];
+		$b = [];
+		#### post
+		$id_kendaraan_masuk = $this->input->post('id');
+		#x
+		$qty_pekerjaan = $this->m_kendaraan->get_pekerjaan($id_kendaraan_masuk)->num_rows();
+		#y
+		$qty_onderdil = $this->m_kendaraan->get_onderdil($id_kendaraan_masuk)->num_rows();
+		#t
+		$tgl_masuk_selesai = $this->m_global->single_row_array('created_at, tgl_selesai', ['deleted_at'=>null, 'id'=>$id_kendaraan_masuk], 't_kendaraan_masuk');
+	
+		$tgl_masuk = DateTime::createFromFormat('Y-m-d H:i:s', $tgl_masuk_selesai['created_at']);
+		$tgl_selesai = DateTime::createFromFormat('Y-m-d H:i:s', $tgl_masuk_selesai['tgl_selesai']);
+		$interval = $tgl_masuk->diff($tgl_selesai);
+		// var_dump($interval);exit;
+		
+		## update t_kendaraan_masuk
+		$this->m_global->update('t_kendaraan_masuk', ['hitung_pekerjaan' => $qty_pekerjaan, 'hitung_onderdil' => $qty_onderdil, 'lama_service' => $interval->d], ['id' => $id_kendaraan_masuk]);
+		## get data kendaraan masuk
+		$data_kendaraan = $this->m_global->multi_row_array('*', ['deleted_at'=>null], 't_kendaraan_masuk', NULL, 'created_at desc', NULL);
+
+		if($data_kendaraan) {
+			foreach ($data_kendaraan as $key => $value) {
+				array_push($x1, $value['hitung_pekerjaan']);
+				array_push($x2, $value['hitung_onderdil']);
+				array_push($t, $value['lama_service']);
+
+				array_push($v11, $this->random_0_1());
+				array_push($v12, $this->random_0_1());
+				array_push($v21, $this->random_0_1());
+				array_push($v22, $this->random_0_1());
+				array_push($bias1, $this->random_0_1());
+				array_push($bias2, $this->random_0_1());
+				array_push($w1, $this->random_0_1());
+				array_push($w2, $this->random_0_1());
+				array_push($b, $this->random_0_1());
+			}
+		}
+
+		$arr_input = [
+			'x1' => $x1,
+            'x2' => $x2,   
+            't' => $t,
+            'a' => 0.1
+		];
+
+		$arr_bobot = [
+			'v11' => $v11,
+            'v12' => $v12,   
+            'v21' => $v21,
+            'v22' => $v22,
+            'bias1' => $bias1,
+            'bias2' => $bias2,
+            'w1' => $w1,
+            'w2' => $w2,
+            'b' => $b,
+		];
+
+		$this->proses_perhitungan(10, $arr_input, $arr_bobot);
+		// exit;
+		// echo "<pre>";
+		// print_r ($arr_input);
+		// echo "</pre>";
+
+		// echo "<pre>";
+		// print_r ($arr_bobot);
+		// echo "</pre>";
+
+		exit;
+
+		var_dump($qty_pekerjaan, $qty_onderdil);exit;
+	}
+
+	public function proses_perhitungan($epoch = 10, $input = null, $bobot = null)
 	{
 
 		### nyeluk library yo mas 
@@ -924,36 +1013,41 @@ class Kendaraan extends CI_Controller {
 
 		$obj_date = new DateTime();
 		$timestamp = $obj_date->format('Y-m-d H:i:s');
-		$id_kendaraan_1 = 1;
-		$id_kendaraan_2 = 2;
+		if($input == null) {
+			######### DUMMY DATA ######
+			$input = [
+				'x1' => [0.5, 0, 0.75, 0.25, 1],
+				'x2' => [0.25, 0, 1, 0.5, 1],   
+				't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1],
+				'a' => 0.1
+			];
+		}else{
+			// normalisasi
+			$input_norm = $this->perhitungan_lib->normalisasi($input);
+		}
 		
-		$input = [
-            'x1' => [0.5, 0, 0.75, 0.25, 1],
-            'x2' => [0.25, 0, 1, 0.5, 1],   
-            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1],
-            'a' => 0.1
-        ];
-
-		$bobot = [
-            'v11' => [0.03,0.03,0.03,0.03,0.03],
-            'v12' => [0.02,0.02,0.02,0.02,0.02],   
-            'v21' => [0.2,0.2,0.2,0.2,0.2,0.2],
-            'v22' => [0.3,0.3,0.3,0.3,0.3,0.3],
-            'bias1' => [0.7,0.7,0.7,0.7,0.7],
-            'bias2' => [0.3,0.3,0.3,0.3,0.3],
-            'w1' => [0.5,0.5,0.5,0.5,0.5],
-            'w2' => [0.09,0.09,0.09,0.09,0.09],
-            'b' => [0.31,0.31,0.31,0.31,0.31],
-        ];
+		if($bobot == null) {
+			######### DUMMY DATA ######
+			$bobot = [
+				'v11' => [0.03,0.03,0.03,0.03,0.03],
+				'v12' => [0.02,0.02,0.02,0.02,0.02],   
+				'v21' => [0.2,0.2,0.2,0.2,0.2,0.2],
+				'v22' => [0.3,0.3,0.3,0.3,0.3,0.3],
+				'bias1' => [0.7,0.7,0.7,0.7,0.7],
+				'bias2' => [0.3,0.3,0.3,0.3,0.3],
+				'w1' => [0.5,0.5,0.5,0.5,0.5],
+				'w2' => [0.09,0.09,0.09,0.09,0.09],
+				'b' => [0.31,0.31,0.31,0.31,0.31],
+			];
+		}
+		
 
 		$this->db->trans_begin();
 
 		$ins_header = [
-			'id_kendaraan_1' => $id_kendaraan_1,
-			'id_kendaraan_2' => $id_kendaraan_2,
-			'arr_input_x1' => json_encode($input['x1']),
-			'arr_input_x2' => json_encode($input['x2']),
-			'arr_input_t' => json_encode($input['t']),
+			'arr_input_x1' => json_encode($input_norm['x1']),
+			'arr_input_x2' => json_encode($input_norm['x2']),
+			'arr_input_t' => json_encode($input_norm['t']),
 			'alpha' => $input['a'],
 			'arr_bobot_v11_awal' => json_encode($bobot['v11']),
 			'arr_bobot_v12_awal' => json_encode($bobot['v12']),
@@ -980,14 +1074,14 @@ class Kendaraan extends CI_Controller {
 				 * param 1 : inputan statis
 				 * param 2 : bobot statis
 				 */
-				$data = $this->perhitungan_lib->main(null, null);
+				$data = $this->perhitungan_lib->main($input_norm, $bobot);
 			}else{
 				/**
 				 * param 1 : inputan statis
 				 * param 2 : bobot statis
 				 * param 3 : prev data loop
 				 */
-				$data = $this->perhitungan_lib->main(null, null, $result[$i-1]);
+				$data = $this->perhitungan_lib->main($input, $bobot, $result[$i-1]);
 			}
 
 			$ins_det = [
@@ -1050,4 +1144,10 @@ class Kendaraan extends CI_Controller {
 		// exit;
 		
 	}
+
+	function random_0_1() 
+	{
+		return (float)rand() / (float)getrandmax();
+	}
+
 }

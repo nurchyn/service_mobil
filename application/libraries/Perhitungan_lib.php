@@ -12,7 +12,7 @@ class Perhitungan_lib extends CI_Controller
 		$arr = [
             'x1' => [0.5, 0, 0.75, 0.25, 1], //dari kolom t_kendaraan_masuk.hitung_pekrtjaan
             'x2' => [0.25, 0, 1, 0.5, 1],   //dari kolom t_kendaraan_masuk.hitung_onderdil
-            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1], //dari kolom t_kendaraan_masuk.hitung_estimasi
+            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1], //lama servis satuan apa ?
             'a' => 0.1
         ];
 
@@ -38,10 +38,45 @@ class Perhitungan_lib extends CI_Controller
 
     ##################################################################################
 
+    public function normalisasi($arr_inputan)
+    {
+        $norm_min = 0;
+        $min_x1 = min($arr_inputan['x1']);
+        $min_x2 = min($arr_inputan['x2']);
+        $min_t = min($arr_inputan['t']);
+
+        $norm_max = 1;
+        $max_x1 = max($arr_inputan['x1']);
+        $max_x2 = max($arr_inputan['x2']);
+        $max_t = max($arr_inputan['t']);
+        
+
+        for ($i=0; $i < count($arr_inputan['x1']); $i++) {  
+           
+            $norm_x1 = @((($arr_inputan['x1'][$i] - $min_x1) / ($max_x1 - $min_x1)) * ($norm_max - $norm_min)) + $norm_min;
+            if (is_nan($norm_x1)) {
+                $norm_x1 =  0; 
+            }
+            $norm_x2 = @((($arr_inputan['x2'][$i] - $min_x2) / ($max_x2 - $min_x2)) * ($norm_max - $norm_min)) + $norm_min;
+            if (is_nan($norm_x2)) {
+                $norm_x2 =  0; 
+            }
+            $norm_t = @((($arr_inputan['t'][$i] - $min_t) / ($max_t - $min_t)) * ($norm_max - $norm_min)) + $norm_min;
+            if (is_nan($norm_t)) {
+                $norm_t =  0; 
+            }
+            
+            $retval['x1'][] = number_format((float)$norm_x1,2);
+            $retval['x2'][] = number_format((float)$norm_x2,2);
+            $retval['t'][] = number_format((float)$norm_t,2);
+            $retval['a'] = $arr_inputan['a'];
+        }
+
+        return $retval;
+    }
+
     public function main($arr_inputan = null, $arr_bobot = null, $prev_data=null)
     {
-       
-
         if($arr_inputan == null) {
             $arr_inputan = $this->get_data_inputan();
         }
@@ -49,13 +84,17 @@ class Perhitungan_lib extends CI_Controller
         if($arr_bobot == null) {
             $arr_bobot = $this->get_bobot();
         }
-
     
         if($prev_data == null) {
+            ### normalisasi array inputan
+            // $arr_inputan = $this->normalisasi($arr_inputan);
+            
             // if epoch 1 bobot statis
             $hidden = $this->show_hidden($arr_inputan, $arr_bobot);
         }
         else{
+            ### normalisasi array inputan
+            // $arr_inputan = $this->normalisasi($arr_inputan);
             // else bobot dinamis
             $arr_bobot = $this->bobot_input_hidden($prev_data);
             $hidden = $this->show_hidden($arr_inputan, $arr_bobot);

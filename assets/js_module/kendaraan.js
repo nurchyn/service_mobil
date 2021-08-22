@@ -630,6 +630,45 @@ function konfirmasi_selesai(id){
     });
 }
 
+function hitung_prediksi(id) {
+    swalConfirmDelete.fire({
+        title: 'Perngatan ?',
+        text: "Apakah Yakin Hitung Prediksi data ini ?",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Konfirmasi !',
+        cancelButtonText: 'Tidak, Batalkan!',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url : base_url + 'kendaraan/hitung_prediksi',
+                type: "POST",
+                dataType: "JSON",
+                data : {id:id},
+                success: function(data)
+                {
+                    swalConfirm.fire('Berhasil Hitung Prediksi !', data.pesan, 'success');
+                    window.open(base_url+'kendaraan/preview_perhitungan', "_blank") || window.location.replace(base_url+'kendaraan/preview_perhitungan');
+                },
+                error: function (jqXHR, textStatus, errorThrown)
+                {
+                    Swal.fire('Terjadi Kesalahan');
+                }
+            });
+        } else if (
+          /* Read more about handling dismissals below */
+          result.dismiss === Swal.DismissReason.cancel
+        ) {
+          swalConfirm.fire(
+            'Dibatalkan',
+            'Aksi Dibatalakan',
+            'error'
+          )
+        }
+    });
+}
+
 function reset_modal_form()
 {
     $('#form-user')[0].reset();

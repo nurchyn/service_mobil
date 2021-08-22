@@ -915,7 +915,7 @@ class Kendaraan extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	public function get_perhitungan($epoch = 2)
+	public function get_perhitungan($epoch = 100)
 	{
 
 		### nyeluk library yo mas 
@@ -925,23 +925,26 @@ class Kendaraan extends CI_Controller {
 		for ($i=0; $i <$epoch; $i++) { 
 			if($i == 0) {
 				//first loop
-				$data = $this->perhitungan_lib->main(null, null, $i+1);
+				/**
+				 * param 1 : inputan statis
+				 * param 2 : bobot statis
+				 */
+				$data = $this->perhitungan_lib->main(null, null);
 			}else{
-				// get previous data
-				// echo "<pre>";
-				// print_r ($result);
-				// echo "</pre>";
-				// exit;
-				$data = $this->perhitungan_lib->main(null, null, $i+1, $result[$i-1]);
+				/**
+				 * param 1 : inputan statis
+				 * param 2 : bobot statis
+				 * param 3 : prev data loop
+				 */
+				$data = $this->perhitungan_lib->main(null, null, $result[$i-1]);
 			}
 
 			array_push($result, $data);
 		}
-		
-		
-		$result = $data; 
+
+
 		echo "<pre>";
-		print_r ($data);
+		print_r ($result);
 		echo "</pre>";
 
 		// exit;

@@ -32,7 +32,7 @@ class Perhitungan_lib
 
     ##################################################################################
 
-    public function main($arr_inputan = null, $arr_bobot = null, $epoch = 1, $prev_data=null)
+    public function main($arr_inputan = null, $arr_bobot = null, $prev_data=null)
     {
        
 
@@ -51,8 +51,8 @@ class Perhitungan_lib
         }
         else{
             // else bobot dinamis
-            $arr_bobot_new = $this->bobot_input_hidden($prev_data);
-            $hidden = $this->show_hidden($arr_inputan, $arr_bobot_new);
+            $arr_bobot = $this->bobot_input_hidden($prev_data);
+            $hidden = $this->show_hidden($arr_inputan, $arr_bobot);
         }
         
         $aktivasi = $this->show_aktivasi($hidden);
@@ -74,15 +74,15 @@ class Perhitungan_lib
     public function bobot_input_hidden($prev_data)
     {
         for ($i=0; $i < count($prev_data['arr_bobot']['v11']); $i++) { 
-            $v11 = $prev_data['arr_bobot']['v11'][$i] * $prev_data['output']['perubahan_bobot_v11'][$i];
-            $v12 = $prev_data['arr_bobot']['v12'][$i] * $prev_data['output']['perubahan_bobot_v12'][$i];  
-            $v21 = $prev_data['arr_bobot']['v21'][$i] * $prev_data['output']['perubahan_bobot_v21'][$i];
-            $v22 = $prev_data['arr_bobot']['v22'][$i] * $prev_data['output']['perubahan_bobot_v22'][$i];
-            $bias1 = $prev_data['arr_bobot']['bias1'][$i] * $prev_data['output']['perubahan_bobot_vb1'][$i];
-            $bias2 = $prev_data['arr_bobot']['bias2'][$i] * $prev_data['output']['perubahan_bobot_vb2'][$i];
-            $w1 =  $prev_data['arr_bobot']['w1'][$i] * $prev_data['output']['perubahan_bobot_w1'][$i];
-            $w2 =  $prev_data['arr_bobot']['w2'][$i] * $prev_data['output']['perubahan_bobot_w2'][$i];
-            $b =  $prev_data['arr_bobot']['b'][$i] * $prev_data['output']['perubahan_bobot_w_bias'][$i];
+            $v11 = $prev_data['arr_bobot']['v11'][$i] + $prev_data['output']['perubahan_bobot_v11'][$i];
+            $v12 = $prev_data['arr_bobot']['v12'][$i] + $prev_data['output']['perubahan_bobot_v12'][$i];  
+            $v21 = $prev_data['arr_bobot']['v21'][$i] + $prev_data['output']['perubahan_bobot_v21'][$i];
+            $v22 = $prev_data['arr_bobot']['v22'][$i] + $prev_data['output']['perubahan_bobot_v22'][$i];
+            $bias1 = $prev_data['arr_bobot']['bias1'][$i] + $prev_data['output']['perubahan_bobot_vb1'][$i];
+            $bias2 = $prev_data['arr_bobot']['bias2'][$i] + $prev_data['output']['perubahan_bobot_vb2'][$i];
+            $w1 =  $prev_data['arr_bobot']['w1'][$i] + $prev_data['output']['perubahan_bobot_w1'][$i];
+            $w2 =  $prev_data['arr_bobot']['w2'][$i] + $prev_data['output']['perubahan_bobot_w2'][$i];
+            $b =  $prev_data['arr_bobot']['b'][$i] + $prev_data['output']['perubahan_bobot_w_bias'][$i];
 
             $retval['v11'][] = $v11;
             $retval['v12'][] = $v12;

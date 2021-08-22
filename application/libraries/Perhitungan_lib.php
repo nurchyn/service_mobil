@@ -10,9 +10,9 @@ class Perhitungan_lib extends CI_Controller
 	public function get_data_inputan()
 	{
 		$arr = [
-            'x1' => [0.5, 0, 0.75, 0.25, 1],
-            'x2' => [0.25, 0, 1, 0.5, 1],   
-            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1],
+            'x1' => [0.5, 0, 0.75, 0.25, 1], //dari kolom t_kendaraan_masuk.hitung_pekrtjaan
+            'x2' => [0.25, 0, 1, 0.5, 1],   //dari kolom t_kendaraan_masuk.hitung_onderdil
+            't' => [0.0555555555555556, 0, 0.444444444444444, 0.666666666666667, 1], //dari kolom t_kendaraan_masuk.hitung_estimasi
             'a' => 0.1
         ];
 

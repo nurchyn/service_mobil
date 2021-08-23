@@ -123,15 +123,35 @@ class Perhitungan_lib extends CI_Controller
     public function bobot_input_hidden($prev_data)
     {
         for ($i=0; $i < count($prev_data['arr_bobot']['v11']); $i++) { 
-            $v11 = $prev_data['arr_bobot']['v11'][$i] + $prev_data['output']['perubahan_bobot_v11'][$i];
-            $v12 = $prev_data['arr_bobot']['v12'][$i] + $prev_data['output']['perubahan_bobot_v12'][$i];  
-            $v21 = $prev_data['arr_bobot']['v21'][$i] + $prev_data['output']['perubahan_bobot_v21'][$i];
-            $v22 = $prev_data['arr_bobot']['v22'][$i] + $prev_data['output']['perubahan_bobot_v22'][$i];
-            $bias1 = $prev_data['arr_bobot']['bias1'][$i] + $prev_data['output']['perubahan_bobot_vb1'][$i];
-            $bias2 = $prev_data['arr_bobot']['bias2'][$i] + $prev_data['output']['perubahan_bobot_vb2'][$i];
-            $w1 =  $prev_data['arr_bobot']['w1'][$i] + $prev_data['output']['perubahan_bobot_w1'][$i];
-            $w2 =  $prev_data['arr_bobot']['w2'][$i] + $prev_data['output']['perubahan_bobot_w2'][$i];
-            $b =  $prev_data['arr_bobot']['b'][$i] + $prev_data['output']['perubahan_bobot_w_bias'][$i];
+            $v11 = number_format((float)$prev_data['arr_bobot']['v11'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_v11'][$i], 5, '.', '');
+            $v12 = number_format((float)$prev_data['arr_bobot']['v12'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_v12'][$i], 5, '.', '');  
+            $v21 = number_format((float)$prev_data['arr_bobot']['v21'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_v21'][$i], 5, '.', '');
+            $v22 = number_format((float)$prev_data['arr_bobot']['v22'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_v22'][$i], 5, '.', '');
+            $bias1 = number_format((float)$prev_data['arr_bobot']['bias1'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_vb1'][$i], 5, '.', '');
+            $bias2 = number_format((float)$prev_data['arr_bobot']['bias2'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_vb2'][$i], 5, '.', '');
+            $w1 =  number_format((float)$prev_data['arr_bobot']['w1'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_w1'][$i], 5, '.', '');
+            $w2 =  number_format((float)$prev_data['arr_bobot']['w2'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_w2'][$i], 5, '.', '');
+            $b =  number_format((float)$prev_data['arr_bobot']['b'][$i], 5, '.', '') + number_format((float)$prev_data['output']['perubahan_bobot_w_bias'][$i], 5, '.', '');
+
+            // $v11 = $prev_data['arr_bobot']['v11'][$i] + $prev_data['output']['perubahan_bobot_v11'][$i];
+            // $v12 = $prev_data['arr_bobot']['v12'][$i] + $prev_data['output']['perubahan_bobot_v12'][$i];  
+            // $v21 = $prev_data['arr_bobot']['v21'][$i] + $prev_data['output']['perubahan_bobot_v21'][$i];
+            // $v22 = $prev_data['arr_bobot']['v22'][$i] + $prev_data['output']['perubahan_bobot_v22'][$i];
+            // $bias1 = $prev_data['arr_bobot']['bias1'][$i] + $prev_data['output']['perubahan_bobot_vb1'][$i];
+            // $bias2 = $prev_data['arr_bobot']['bias2'][$i] + $prev_data['output']['perubahan_bobot_vb2'][$i];
+            // $w1 =  $prev_data['arr_bobot']['w1'][$i] + $prev_data['output']['perubahan_bobot_w1'][$i];
+            // $w2 =  $prev_data['arr_bobot']['w2'][$i] + $prev_data['output']['perubahan_bobot_w2'][$i];
+            // $b =  $prev_data['arr_bobot']['b'][$i] + $prev_data['output']['perubahan_bobot_w_bias'][$i];
+
+            // $v11 = bcadd($prev_data['arr_bobot']['v11'][$i], $prev_data['output']['perubahan_bobot_v11'][$i], 5);
+            // $v12 = bcadd($prev_data['arr_bobot']['v12'][$i], $prev_data['output']['perubahan_bobot_v12'][$i], 5);  
+            // $v21 = bcadd($prev_data['arr_bobot']['v21'][$i], $prev_data['output']['perubahan_bobot_v21'][$i], 5);
+            // $v22 = bcadd($prev_data['arr_bobot']['v22'][$i], $prev_data['output']['perubahan_bobot_v22'][$i], 5);
+            // $bias1 = bcadd($prev_data['arr_bobot']['bias1'][$i], $prev_data['output']['perubahan_bobot_vb1'][$i], 5);
+            // $bias2 = bcadd($prev_data['arr_bobot']['bias2'][$i], $prev_data['output']['perubahan_bobot_vb2'][$i], 5);
+            // $w1 =  bcadd($prev_data['arr_bobot']['w1'][$i], $prev_data['output']['perubahan_bobot_w1'][$i], 5);
+            // $w2 =  bcadd($prev_data['arr_bobot']['w2'][$i], $prev_data['output']['perubahan_bobot_w2'][$i], 5);
+            // $b =  bcadd($prev_data['arr_bobot']['b'][$i], $prev_data['output']['perubahan_bobot_w_bias'][$i], 5);
 
             $retval['v11'][] = number_format((float)$v11, 5, '.', '');
             $retval['v12'][] = number_format((float)$v12, 5, '.', '');
@@ -179,7 +199,8 @@ class Perhitungan_lib extends CI_Controller
 
     public function show_output($arr_inputan, $arr_bobot, $arr_aktivasi) {
         for ($i=0; $i < count($arr_aktivasi['z1']); $i++) { 
-            $y = $arr_bobot['b'][$i] + ($arr_aktivasi['z1'][$i] * $arr_bobot['w1'][$i]) + ($arr_aktivasi['z2'][$i] * $arr_bobot['w2'][$i]);
+            // $y = $arr_bobot['b'][$i] + ($arr_aktivasi['z1'][$i] * $arr_bobot['w1'][$i]) + ($arr_aktivasi['z2'][$i] * $arr_bobot['w2'][$i]);
+            $y = $arr_bobot['b'][$i] + (bcmul($arr_aktivasi['z1'][$i], $arr_bobot['w1'][$i])) + (bcmul($arr_aktivasi['z2'][$i], $arr_bobot['w2'][$i]));
             $ak1 = 1/(1+exp(-($y)));
             $faktor_error_y  = ($arr_inputan['t'][$i] - $y) * $y * (1-$y);
 

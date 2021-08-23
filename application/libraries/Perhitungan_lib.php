@@ -66,9 +66,12 @@ class Perhitungan_lib extends CI_Controller
                 $norm_t =  0; 
             }
             
-            $retval['x1'][] = number_format((float)$norm_x1,2);
-            $retval['x2'][] = number_format((float)$norm_x2,2);
-            $retval['t'][] = number_format((float)$norm_t,2);
+            // $retval['x1'][] = number_format((float)$norm_x1,2);
+            // $retval['x2'][] = number_format((float)$norm_x2,2);
+            // $retval['t'][] = number_format((float)$norm_t,2);
+            $retval['x1'][] = (float)$norm_x1;
+            $retval['x2'][] = (float)$norm_x2;
+            $retval['t'][] = (float)$norm_t;
             $retval['a'] = $arr_inputan['a'];
         }
 
@@ -86,16 +89,11 @@ class Perhitungan_lib extends CI_Controller
         }
     
         if($prev_data == null) {
-            ### normalisasi array inputan
-            // $arr_inputan = $this->normalisasi($arr_inputan);
-            
             // if epoch 1 bobot statis
             $hidden = $this->show_hidden($arr_inputan, $arr_bobot);
         }
         else{
-            ### normalisasi array inputan
-            // $arr_inputan = $this->normalisasi($arr_inputan);
-            // else bobot dinamis
+            // else bobot dinamis        
             $arr_bobot = $this->bobot_input_hidden($prev_data);
             $hidden = $this->show_hidden($arr_inputan, $arr_bobot);
         }
@@ -111,6 +109,12 @@ class Perhitungan_lib extends CI_Controller
             'output' => $output,
             'mse' => $mse
         ];
+
+        
+        // echo "<pre>";
+        // print_r ($retval);
+        // echo "</pre>";
+        // exit;
         
         return $retval;
         
@@ -129,15 +133,15 @@ class Perhitungan_lib extends CI_Controller
             $w2 =  $prev_data['arr_bobot']['w2'][$i] + $prev_data['output']['perubahan_bobot_w2'][$i];
             $b =  $prev_data['arr_bobot']['b'][$i] + $prev_data['output']['perubahan_bobot_w_bias'][$i];
 
-            $retval['v11'][] = $v11;
-            $retval['v12'][] = $v12;
-            $retval['v21'][] = $v21;
-            $retval['v22'][] = $v22;
-            $retval['bias1'][] = $bias1;
-            $retval['bias2'][] = $bias2;
-            $retval['w1'][] = $w1;
-            $retval['w2'][] = $w2;
-            $retval['b'][] = $b;
+            $retval['v11'][] = number_format((float)$v11, 5, '.', '');
+            $retval['v12'][] = number_format((float)$v12, 5, '.', '');
+            $retval['v21'][] = number_format((float)$v21, 5, '.', '');
+            $retval['v22'][] = number_format((float)$v22, 5, '.', '');
+            $retval['bias1'][] = number_format((float)$bias1, 5, '.', '');
+            $retval['bias2'][] = number_format((float)$bias2, 5, '.', '');
+            $retval['w1'][] = number_format((float)$w1, 5, '.', '');
+            $retval['w2'][] = number_format((float)$w2, 5, '.', '');
+            $retval['b'][] = number_format((float)$b, 5, '.', '');
         }
 
         return $retval;
@@ -151,8 +155,8 @@ class Perhitungan_lib extends CI_Controller
             $hdn_z1 = $arr_bobot['bias1'][$i] + ($arr_inputan['x1'][$i] * $arr_bobot['v11'][$i]) + ($arr_inputan['x2'][$i] * $arr_bobot['v12'][$i]);
             $hdn_z2 = $arr_bobot['bias2'][$i] + ($arr_inputan['x1'][$i] * $arr_bobot['v21'][$i]) + ($arr_inputan['x2'][$i] * $arr_bobot['v22'][$i]);
 
-            $retval['z1'][] = $hdn_z1;
-            $retval['z2'][] = $hdn_z2;
+            $retval['z1'][] = number_format((float)$hdn_z1, 5, '.', '');
+            $retval['z2'][] = number_format((float)$hdn_z2, 5, '.', '');
         } 
         
         return $retval;
@@ -174,20 +178,20 @@ class Perhitungan_lib extends CI_Controller
     }
 
     public function show_output($arr_inputan, $arr_bobot, $arr_aktivasi) {
-        for ($i=0; $i < count($arr_aktivasi['z1_raw']); $i++) { 
-            $y = $arr_bobot['b'][$i] + ($arr_aktivasi['z1_raw'][$i] * $arr_bobot['w1'][$i]) + ($arr_aktivasi['z2_raw'][$i] * $arr_bobot['w2'][$i]);
+        for ($i=0; $i < count($arr_aktivasi['z1']); $i++) { 
+            $y = $arr_bobot['b'][$i] + ($arr_aktivasi['z1'][$i] * $arr_bobot['w1'][$i]) + ($arr_aktivasi['z2'][$i] * $arr_bobot['w2'][$i]);
             $ak1 = 1/(1+exp(-($y)));
             $faktor_error_y  = ($arr_inputan['t'][$i] - $y) * $y * (1-$y);
 
-            $perubahan_bobot_w1 = $arr_inputan['a'] * $arr_aktivasi['z1_raw'][$i] * $faktor_error_y;
-            $perubahan_bobot_w2 = $arr_inputan['a'] * $arr_aktivasi['z2_raw'][$i] * $faktor_error_y;
+            $perubahan_bobot_w1 = $arr_inputan['a'] * $arr_aktivasi['z1'][$i] * $faktor_error_y;
+            $perubahan_bobot_w2 = $arr_inputan['a'] * $arr_aktivasi['z2'][$i] * $faktor_error_y;
             $perubahan_bobot_w_bias = $arr_inputan['a'] * $faktor_error_y * 1;
 
             $faktor_error_z_net1  = $faktor_error_y * $arr_bobot['w1'][$i];
             $faktor_error_z_net2  = $faktor_error_y * $arr_bobot['w2'][$i];
             
-            $faktor_error_z1 = $faktor_error_z_net1 * $arr_aktivasi['z1_raw'][$i] * (1-$arr_aktivasi['z1_raw'][$i]);
-            $faktor_error_z2 = $faktor_error_z_net2 * $arr_aktivasi['z2_raw'][$i] * (1-$arr_aktivasi['z2_raw'][$i]);
+            $faktor_error_z1 = $faktor_error_z_net1 * $arr_aktivasi['z1'][$i] * (1-$arr_aktivasi['z1'][$i]);
+            $faktor_error_z2 = $faktor_error_z_net2 * $arr_aktivasi['z2'][$i] * (1-$arr_aktivasi['z2'][$i]);
 
             $perubahan_bobot_v11 = $arr_inputan['a'] * $faktor_error_z1 * $arr_inputan['x1'][$i];
             $perubahan_bobot_v12 = $arr_inputan['a'] * $faktor_error_z1 * $arr_inputan['x2'][$i];
@@ -201,27 +205,27 @@ class Perhitungan_lib extends CI_Controller
 
             $retval['y'][] = number_format((float)$y, 3, '.', '');
             $retval['aktivasi'][] = number_format((float)$ak1, 3, '.', '');
-            $retval['faktor_error_y'][] = $faktor_error_y;
+            $retval['faktor_error_y'][] = number_format((float)$faktor_error_y, 5, '.', '');
 
-            $retval['perubahan_bobot_w1'][] = $perubahan_bobot_w1;
-            $retval['perubahan_bobot_w2'][] = $perubahan_bobot_w2;
-            $retval['perubahan_bobot_w_bias'][] = $perubahan_bobot_w_bias;  
+            $retval['perubahan_bobot_w1'][] = number_format((float) $perubahan_bobot_w1, 5, '.', '');
+            $retval['perubahan_bobot_w2'][] = number_format((float) $perubahan_bobot_w2, 5, '.', '');
+            $retval['perubahan_bobot_w_bias'][] = number_format((float) $perubahan_bobot_w_bias, 5, '.', '');  
 
-            $retval['faktor_error_z_net1'][] = $faktor_error_z_net1;
-            $retval['faktor_error_z_net2'][] = $faktor_error_z_net2;
+            $retval['faktor_error_z_net1'][] = number_format((float) $faktor_error_z_net1, 5, '.', '');
+            $retval['faktor_error_z_net2'][] = number_format((float) $faktor_error_z_net2, 5, '.', '');
 
-            $retval['faktor_error_z1'][] = $faktor_error_z1;
-            $retval['faktor_error_z2'][] = $faktor_error_z2;
+            $retval['faktor_error_z1'][] = number_format((float) $faktor_error_z1, 5, '.', '');
+            $retval['faktor_error_z2'][] = number_format((float) $faktor_error_z2, 5, '.', '');
             
-            $retval['perubahan_bobot_v11'][] = $perubahan_bobot_v11;
-            $retval['perubahan_bobot_v12'][] = $perubahan_bobot_v12;
-            $retval['perubahan_bobot_v21'][] = $perubahan_bobot_v21;
-            $retval['perubahan_bobot_v22'][] = $perubahan_bobot_v22;
-            $retval['perubahan_bobot_vb1'][] = $perubahan_bobot_vb1;
-            $retval['perubahan_bobot_vb2'][] = $perubahan_bobot_vb2;
+            $retval['perubahan_bobot_v11'][] = number_format((float) $perubahan_bobot_v11, 5, '.', '');
+            $retval['perubahan_bobot_v12'][] = number_format((float) $perubahan_bobot_v12, 5, '.', '');
+            $retval['perubahan_bobot_v21'][] = number_format((float) $perubahan_bobot_v21, 5, '.', '');
+            $retval['perubahan_bobot_v22'][] = number_format((float) $perubahan_bobot_v22, 5, '.', '');
+            $retval['perubahan_bobot_vb1'][] = number_format((float) $perubahan_bobot_vb1, 5, '.', '');
+            $retval['perubahan_bobot_vb2'][] = number_format((float) $perubahan_bobot_vb2, 5, '.', '');
 
-            $retval['error'][] = $error;
-            $retval['error2'][] = $error2;
+            $retval['error'][] = number_format((float) $error, 2, '.', '');
+            $retval['error2'][] = number_format((float) $error2, 2, '.', '');
 
         } 
 
@@ -230,6 +234,6 @@ class Perhitungan_lib extends CI_Controller
 
     public function show_mse($arr_output)
     {
-       return array_sum($arr_output['error2']) / count($arr_output['error2']);
+       return number_format((float) array_sum($arr_output['error2']) / count($arr_output['error2']), 2, '.', '');
     }
 }

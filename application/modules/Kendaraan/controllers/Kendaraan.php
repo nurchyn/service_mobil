@@ -943,12 +943,19 @@ class Kendaraan extends CI_Controller {
 		$tgl_masuk_selesai = $this->m_global->single_row_array('created_at, tgl_selesai', ['deleted_at'=>null, 'id'=>$id_kendaraan_masuk], 't_kendaraan_masuk');
 	
 		$tgl_masuk = DateTime::createFromFormat('Y-m-d H:i:s', $tgl_masuk_selesai['created_at']);
-		$tgl_selesai = DateTime::createFromFormat('Y-m-d H:i:s', $tgl_masuk_selesai['tgl_selesai']);
-		$interval = $tgl_masuk->diff($tgl_selesai);
-		// var_dump($interval);exit;
+
+		if($tgl_masuk_selesai['tgl_selesai'] == null) {
+			$tgl_selesai = $tgl_masuk->modify('+2 days');
+			$interval = $tgl_masuk->diff($tgl_selesai);
+			## update t_kendaraan_masuk
+			$this->m_global->update('t_kendaraan_masuk', ['hitung_pekerjaan' => $qty_pekerjaan, 'hitung_onderdil' => $qty_onderdil, 'lama_service' => $interval->d, 'tgl_selesai' => $tgl_selesai], ['id' => $id_kendaraan_masuk]);
+		}else{
+			$tgl_selesai = DateTime::createFromFormat('Y-m-d H:i:s', $tgl_masuk_selesai['tgl_selesai']);
+			$interval = $tgl_masuk->diff($tgl_selesai);
+			## update t_kendaraan_masuk
+			$this->m_global->update('t_kendaraan_masuk', ['hitung_pekerjaan' => $qty_pekerjaan, 'hitung_onderdil' => $qty_onderdil, 'lama_service' => $interval->d], ['id' => $id_kendaraan_masuk]);
+		}
 		
-		## update t_kendaraan_masuk
-		$this->m_global->update('t_kendaraan_masuk', ['hitung_pekerjaan' => $qty_pekerjaan, 'hitung_onderdil' => $qty_onderdil, 'lama_service' => $interval->d], ['id' => $id_kendaraan_masuk]);
 		## get data kendaraan masuk
 		$data_kendaraan = $this->m_global->multi_row_array('*', ['deleted_at'=>null], 't_kendaraan_masuk', NULL, 'created_at desc', NULL);
 
@@ -958,15 +965,30 @@ class Kendaraan extends CI_Controller {
 				array_push($x2, $value['hitung_onderdil']);
 				array_push($t, $value['lama_service']);
 
-				array_push($v11, $this->random_0_1());
-				array_push($v12, $this->random_0_1());
-				array_push($v21, $this->random_0_1());
-				array_push($v22, $this->random_0_1());
-				array_push($bias1, $this->random_0_1());
-				array_push($bias2, $this->random_0_1());
-				array_push($w1, $this->random_0_1());
-				array_push($w2, $this->random_0_1());
-				array_push($b, $this->random_0_1());
+				if($key == 0) {
+					//first loop 
+					array_push($v11, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($v12, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($v21, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($v22, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($bias1, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($bias2, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($w1, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($w2, number_format((float)$this->random_0_1(), 2, '.', ''));
+					array_push($b, number_format((float)$this->random_0_1(), 2, '.', ''));
+				}else{
+					// duplicate sisanya
+					array_push($v11, $v11[0]);
+					array_push($v12, $v12[0]);
+					array_push($v21, $v21[0]);
+					array_push($v22, $v22[0]);
+					array_push($bias1, $bias1[0]);
+					array_push($bias2, $bias2[0]);
+					array_push($w1, $w1[0]);
+					array_push($w2, $w2[0]);
+					array_push($b, $b[0]);
+				}
+				
 			}
 		}
 
@@ -1081,7 +1103,7 @@ class Kendaraan extends CI_Controller {
 				 * param 2 : bobot statis
 				 * param 3 : prev data loop
 				 */
-				$data = $this->perhitungan_lib->main($input, $bobot, $result[$i-1]);
+				$data = $this->perhitungan_lib->main($input_norm, $bobot, $result[$i-1]);
 			}
 
 			$ins_det = [

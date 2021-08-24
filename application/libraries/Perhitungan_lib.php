@@ -255,6 +255,7 @@ class Perhitungan_lib extends CI_Controller
 
     public function show_mse($arr_output)
     {
-       return number_format((float) array_sum($arr_output['error2']) / count($arr_output['error2']), 2, '.', '');
+        //    return number_format((float) array_sum($arr_output['error2']) / count($arr_output['error2']), 6, '.', '');
+        return array_sum($arr_output['error2']) / count($arr_output['error2']);
     }
 }

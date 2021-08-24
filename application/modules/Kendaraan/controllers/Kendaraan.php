@@ -1011,7 +1011,7 @@ class Kendaraan extends CI_Controller {
             'b' => $b,
 		];
 
-		$this->proses_perhitungan(1000, $arr_input, $arr_bobot);
+		$this->proses_perhitungan(100, $arr_input, $arr_bobot, $id_kendaraan_masuk);
 		// exit;
 		// echo "<pre>";
 		// print_r ($arr_input);
@@ -1020,13 +1020,9 @@ class Kendaraan extends CI_Controller {
 		// echo "<pre>";
 		// print_r ($arr_bobot);
 		// echo "</pre>";
-
-		exit;
-
-		var_dump($qty_pekerjaan, $qty_onderdil);exit;
 	}
 
-	public function proses_perhitungan($epoch = 10, $input = null, $bobot = null)
+	public function proses_perhitungan($epoch = 10, $input = null, $bobot = null, $id_kendaraan_masuk)
 	{
 
 		### nyeluk library yo mas 
@@ -1143,7 +1139,8 @@ class Kendaraan extends CI_Controller {
 				'mse' => $data['mse'],
 			];
 
-			$this->m_global->store($ins_det, 't_perhitungan_det');
+			$id_det = $this->m_global->store_id($ins_det, 't_perhitungan_det');
+			
 			$arr_mse[] = $data['mse'];
 
 			if ($this->db->trans_status() === FALSE){
@@ -1155,15 +1152,108 @@ class Kendaraan extends CI_Controller {
 			}
 
 			array_push($result, $data);
+
+			// jika mse == alpha
+			if ((float)$data['mse'] < 0.01) {
+				// break loop
+				break;
+				// get min mse
+				$mse_min = min($arr_mse);
+				// update_t_perhitungan
+				$this->m_global->update('t_perhitungan', ['mse_terkecil' => $mse_min], ['id' => $id_header]);
+				// update_t_perhitungan_det
+				$this->m_global->update('t_perhitungan_det', ['is_stop' => '1'], ['id' => $id_det]);
+
+				### insert t_denormalisasi
+				### get array key in selected array
+				$idx_error = min(array_keys($data['output']['error']));
+				
+				$hidden_z1 = $data['arr_bobot']['bias1'][$idx_error] + ($input_norm['x1'][$idx_error] * $data['arr_bobot']['v11'][$idx_error]) + ($input_norm['x2'][$idx_error] * $data['arr_bobot']['v12'][$idx_error]);
+				$hidden_z2 = $data['arr_bobot']['bias2'][$idx_error] + ($input_norm['x1'][$idx_error] * $data['arr_bobot']['v21'][$idx_error]) + ($input_norm['x2'][$idx_error] * $data['arr_bobot']['v22'][$idx_error]);
+				$ak1 = 1 / (1 + exp(- ($hidden_z1)));
+				$ak2 = 1 / (1 + exp(- ($hidden_z2)));
+				$output_y = $data['output']['perubahan_bobot_w_bias'][$idx_error] + ($ak1 * $data['output']['perubahan_bobot_w1'][$idx_error]) + ($ak2 * $data['output']['perubahan_bobot_w2'][$idx_error]);
+				$hasil_denom = (max($input_norm['t']) - min($input_norm['t'])) * $output_y + min($input_norm['t']);
+				
+				$arr_denom = [
+					'id_perhitungan' => $id_header,
+					'v11' => $data['arr_bobot']['v11'][$idx_error],
+					'v12' => $data['arr_bobot']['v12'][$idx_error],
+					'v21' => $data['arr_bobot']['v21'][$idx_error],
+					'v22' => $data['arr_bobot']['v22'][$idx_error],
+					'bias_1' => $data['arr_bobot']['bias1'][$idx_error],
+					'bias_2' => $data['arr_bobot']['bias2'][$idx_error],
+					'hidden_z1' => $hidden_z1,
+					'hidden_z2' => $hidden_z2,
+					'aktivasi_z1' => $ak1,
+					'aktivasi_z2' => $ak2,
+					'w1' => $data['output']['perubahan_bobot_w1'][$idx_error],
+					'w2' => $data['output']['perubahan_bobot_w2'][$idx_error],
+					'b' => $data['output']['perubahan_bobot_w_bias'][$idx_error],
+					'y' => $output_y,
+					'hasil_denom' => number_format((float)$hasil_denom, 2, '.', '')
+				];
+				
+				$this->m_global->store($arr_denom, 't_denormalisasi');
+				### end insert t_denormalisasi
+
+				echo json_encode([
+					'status' => TRUE,
+					'pesan' => 'Sukses Menghitung Perhitungan'
+				]);
+
+				return;
+			}
 		}
 		
 		$mse_min = min($arr_mse);
 		// update_t_perhitungan
 		$this->m_global->update('t_perhitungan', ['mse_terkecil' => $mse_min], ['id' => $id_header]);
+		// update_t_perhitungan_det
+		$this->m_global->update('t_perhitungan_det', ['is_stop' => '1'], ['id' => $id_det]);
 
-		echo 'sukses';
+		### insert t_denormalisasi
+		### get array key in selected array
+		$idx_error = min(array_keys($data['output']['error']));
 
-		// exit;
+		$hidden_z1 = $data['arr_bobot']['bias1'][$idx_error] + ($input_norm['x1'][$idx_error] * $data['arr_bobot']['v11'][$idx_error]) + ($input_norm['x2'][$idx_error] * $data['arr_bobot']['v12'][$idx_error]);
+		$hidden_z2 = $data['arr_bobot']['bias2'][$idx_error] + ($input_norm['x1'][$idx_error] * $data['arr_bobot']['v21'][$idx_error]) + ($input_norm['x2'][$idx_error] * $data['arr_bobot']['v22'][$idx_error]);
+		$ak1 = 1 / (1 + exp(- ($hidden_z1)));
+		$ak2 = 1 / (1 + exp(- ($hidden_z2)));
+		$output_y = $data['output']['perubahan_bobot_w_bias'][$idx_error] + ($ak1 * $data['output']['perubahan_bobot_w1'][$idx_error]) + ($ak2 * $data['output']['perubahan_bobot_w2'][$idx_error]);
+		$hasil_denom = (max($input['t']) - min($input['t'])) * $output_y + min($input['t']);
+
+		$arr_denom = [
+			'id_perhitungan' => $id_header,
+			'v11' => $data['arr_bobot']['v11'][$idx_error],
+			'v12' => $data['arr_bobot']['v12'][$idx_error],
+			'v21' => $data['arr_bobot']['v21'][$idx_error],
+			'v22' => $data['arr_bobot']['v22'][$idx_error],
+			'bias_1' => $data['arr_bobot']['bias1'][$idx_error],
+			'bias_2' => $data['arr_bobot']['bias2'][$idx_error],
+			'hidden_z1' => $hidden_z1,
+			'hidden_z2' => $hidden_z2,
+			'aktivasi_z1' => $ak1,
+			'aktivasi_z2' => $ak2,
+			'w1' => $data['output']['perubahan_bobot_w1'][$idx_error],
+			'w2' => $data['output']['perubahan_bobot_w2'][$idx_error],
+			'b' => $data['output']['perubahan_bobot_w_bias'][$idx_error],
+			'y' => $output_y,
+			'hasil_denom' => number_format((float)$hasil_denom, 2, '.', '')
+		];
+
+		$this->m_global->store($arr_denom, 't_denormalisasi');
+		### end insert t_denormalisasi
+
+		## update t_kendaraan_masuk
+		$this->m_global->update('t_kendaraan_masuk', ['hitung_estimasi' => round($hasil_denom)], ['id' => $id_kendaraan_masuk]);
+
+		echo json_encode([
+			'status' => TRUE,
+			'pesan' => 'Sukses Menghitung Perhitungan'
+		]);
+
+		return;
 		
 	}
 

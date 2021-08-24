@@ -1114,6 +1114,8 @@ class Kendaraan extends CI_Controller {
 				'arr_bobot_w1' => json_encode($data['arr_bobot']['w1']),
 				'arr_bobot_w2' => json_encode($data['arr_bobot']['w2']),
 				'arr_bobot_b' => json_encode($data['arr_bobot']['b']),
+				'arr_hidden_z1'  => json_encode($data['arr_hidden']['z1']),
+				'arr_hidden_z2' => json_encode($data['arr_hidden']['z2']),
 				'arr_aktivasi_z1_raw' => json_encode($data['aktivasi']['z1_raw']),
 				'arr_aktivasi_z2_raw' => json_encode($data['aktivasi']['z2_raw']),
 				'arr_aktivasi_z1' => json_encode($data['aktivasi']['z1']),
@@ -1199,6 +1201,7 @@ class Kendaraan extends CI_Controller {
 
 				echo json_encode([
 					'status' => TRUE,
+					'id_perhitungan' => $id_header,
 					'pesan' => 'Sukses Menghitung Perhitungan'
 				]);
 
@@ -1250,10 +1253,30 @@ class Kendaraan extends CI_Controller {
 
 		echo json_encode([
 			'status' => TRUE,
+			'id_perhitungan' => $id_header,
 			'pesan' => 'Sukses Menghitung Perhitungan'
 		]);
 
 		return;
+		
+	}
+
+	public function preview_perhitungan($id_perhitungan)
+	{
+		$data['perhitungan'] = $this->m_global->single_row_array('*', ['id' => $id_perhitungan], 't_perhitungan');
+		$data['perhitungan_det'] = $this->m_global->multi_row_array('*', ['id_perhitungan' => $id_perhitungan], 't_perhitungan_det', null, 'epoch_ke');
+		$data['denormalisasi'] = $this->m_global->single_row_array('*', ['id_perhitungan' => $id_perhitungan], 't_denormalisasi');
+
+
+		
+		// echo "<pre>";
+		// print_r ($data);
+		// echo "</pre>";
+		// exit;
+
+		// var_dump($data);exit;
+		
+		$this->load->view('preview_perhitungan', $data, FALSE);
 		
 	}
 

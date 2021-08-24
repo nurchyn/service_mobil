@@ -105,6 +105,7 @@ class Perhitungan_lib extends CI_Controller
         $retval = [
             'arr_inputan' => $arr_inputan,
             'arr_bobot' => $arr_bobot,
+            'arr_hidden' => $hidden,
             'aktivasi' => $aktivasi,
             'output' => $output,
             'mse' => $mse

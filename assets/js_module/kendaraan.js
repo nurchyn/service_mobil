@@ -649,7 +649,7 @@ function hitung_prediksi(id) {
                 success: function(data)
                 {
                     swalConfirm.fire('Berhasil Hitung Prediksi !', data.pesan, 'success');
-                    window.open(base_url+'kendaraan/preview_perhitungan', "_blank") || window.location.replace(base_url+'kendaraan/preview_perhitungan');
+                    window.open(base_url+'kendaraan/preview_perhitungan/'+data.id_perhitungan, "_blank") || window.location.replace(base_url+'kendaraan/preview_perhitungan/'+data.id_perhitungan);
                 },
                 error: function (jqXHR, textStatus, errorThrown)
                 {

@@ -19,6 +19,39 @@
 
 <body>
 
+  <h3>Denormalisasi</h3>
+  <table style="width:100%">
+    <tr>
+      <th colspan="6">bobot</th>
+      <th colspan="2">input ke hidden</th>
+      <th colspan="2">hidden</th>
+      <th colspan="2">aktivasi</th>
+      <th>bobot hidden ke output</th>
+      <th>output</th>
+    </tr>
+    <tr>
+      <td><?= $denormalisasi['v11']; ?></td>
+      <td><?= $denormalisasi['v12']; ?></td>
+      <td><?= $denormalisasi['v21']; ?></td>
+      <td><?= $denormalisasi['v22']; ?></td>
+      <td><?= $denormalisasi['bias_1']; ?></td>
+      <td><?= $denormalisasi['bias_2']; ?></td>
+
+      <td><?= $denormalisasi['aktivasi_z1']; ?></td>
+      <td><?= $denormalisasi['aktivasi_z2']; ?></td>
+      <td><?= $denormalisasi['hidden_z1']; ?></td>
+      <td><?= $denormalisasi['hidden_z2']; ?></td>
+      <td><?= $denormalisasi['w1']; ?></td>
+      <td><?= $denormalisasi['w2']; ?></td>
+
+      <td><?= $denormalisasi['b']; ?></td>
+      <td><?= $denormalisasi['y']; ?></td>
+    </tr>
+
+
+  </table>
+  <h3>Hasil : <?= $denormalisasi['hasil_denom']; ?></h3>
+  <hr>
   <table style="width:100%">
     <tr>
       <th>Epoh ke-</th>
@@ -75,7 +108,7 @@
     <?php for ($i = 0; $i < count($perhitungan_det, true); $i++) { ?>
       <?php for ($z = 0; $z < count(json_decode($perhitungan_det[$i]['arr_bobot_v11'], true)); $z++) { ?>
 
-        <tr <?php if($perhitungan_det[$i]['is_stop'] == '1') { ?> style="color:red;" <?php }?>>
+        <tr <?php if ($perhitungan_det[$i]['is_stop'] == '1') { ?> style="color:red;" <?php } ?>>
           <td><?= $perhitungan_det[$i]['epoch_ke']; ?></td>
           <td><?= json_decode($perhitungan['arr_input_x1'], true)[$z]; ?></td>
           <td><?= json_decode($perhitungan['arr_input_x2'], true)[$z]; ?></td>
@@ -111,13 +144,17 @@
           <td><?= json_decode($perhitungan_det[$i]['arr_output_perubahan_bobot_vb2'], true)[$z]; ?></td>
           <td><?= json_decode($perhitungan_det[$i]['arr_output_error'], true)[$z]; ?></td>
           <td><?= json_decode($perhitungan_det[$i]['arr_output_error2'], true)[$z]; ?></td>
-          <td><?= $perhitungan_det[$z]['mse']; ?></td>
+          <td><?= $perhitungan_det[$i]['mse']; ?></td>
         </tr>
       <?php  } ?>
 
     <?php } ?>
 
   </table>
+  <br>
+
+
+
 </body>
 
 </html>

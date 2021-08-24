@@ -1011,7 +1011,7 @@ class Kendaraan extends CI_Controller {
             'b' => $b,
 		];
 
-		$this->proses_perhitungan(100, $arr_input, $arr_bobot, $id_kendaraan_masuk);
+		$this->proses_perhitungan(1000, $arr_input, $arr_bobot, $id_kendaraan_masuk);
 		// exit;
 		// echo "<pre>";
 		// print_r ($arr_input);
